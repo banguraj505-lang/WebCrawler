@@ -12,6 +12,8 @@ import {
   type RegistrationAssistance,
   type InsertRegistrationAssistance
 } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -140,4 +142,86 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// Database Storage Implementation
+export class DatabaseStorage implements IStorage {
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
+    return user;
+  }
+
+  async createInquiry(insertInquiry: InsertInquiry): Promise<Inquiry> {
+    const [inquiry] = await db
+      .insert(inquiries)
+      .values({
+        ...insertInquiry,
+        phone: insertInquiry.phone || null,
+      })
+      .returning();
+    return inquiry;
+  }
+
+  async getInquiries(): Promise<Inquiry[]> {
+    return await db.select().from(inquiries).orderBy(inquiries.createdAt);
+  }
+
+  async getInquiry(id: number): Promise<Inquiry | undefined> {
+    const [inquiry] = await db.select().from(inquiries).where(eq(inquiries.id, id));
+    return inquiry || undefined;
+  }
+
+  async createServiceRequest(insertRequest: InsertServiceRequest): Promise<ServiceRequest> {
+    const [request] = await db
+      .insert(serviceRequests)
+      .values({
+        ...insertRequest,
+        phone: insertRequest.phone || null,
+        urgency: insertRequest.urgency || "normal",
+      })
+      .returning();
+    return request;
+  }
+
+  async getServiceRequests(): Promise<ServiceRequest[]> {
+    return await db.select().from(serviceRequests).orderBy(serviceRequests.createdAt);
+  }
+
+  async getServiceRequest(id: number): Promise<ServiceRequest | undefined> {
+    const [request] = await db.select().from(serviceRequests).where(eq(serviceRequests.id, id));
+    return request || undefined;
+  }
+
+  async createRegistrationAssistance(insertAssistance: InsertRegistrationAssistance): Promise<RegistrationAssistance> {
+    const [assistance] = await db
+      .insert(registrationAssistance)
+      .values({
+        ...insertAssistance,
+        documents: insertAssistance.documents || null,
+      })
+      .returning();
+    return assistance;
+  }
+
+  async getRegistrationAssistance(): Promise<RegistrationAssistance[]> {
+    return await db.select().from(registrationAssistance).orderBy(registrationAssistance.createdAt);
+  }
+
+  async getRegistrationAssistanceById(id: number): Promise<RegistrationAssistance | undefined> {
+    const [assistance] = await db.select().from(registrationAssistance).where(eq(registrationAssistance.id, id));
+    return assistance || undefined;
+  }
+}
+
+export const storage = new DatabaseStorage();
