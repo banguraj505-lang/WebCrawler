@@ -258,6 +258,7 @@ export default function EducationServices() {
                         placeholder="List any documents you already have..."
                         className="resize-none"
                         {...field}
+                        value={field.value || ""}
                       />
                     </FormControl>
                     <FormMessage />
