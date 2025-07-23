@@ -122,7 +122,7 @@ export default function ServiceFormModal({ isOpen, onClose, serviceType }: Servi
                   <FormItem>
                     <FormLabel>Phone (Optional)</FormLabel>
                     <FormControl>
-                      <Input type="tel" placeholder="Phone number" {...field} />
+                      <Input type="tel" placeholder="Phone number" {...field} value={field.value || ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

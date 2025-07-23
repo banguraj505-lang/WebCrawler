@@ -74,6 +74,7 @@ export class MemStorage implements IStorage {
     const inquiry: Inquiry = {
       ...insertInquiry,
       id,
+      phone: insertInquiry.phone || null,
       status: "pending",
       createdAt: new Date(),
     };
@@ -96,6 +97,8 @@ export class MemStorage implements IStorage {
     const request: ServiceRequest = {
       ...insertRequest,
       id,
+      phone: insertRequest.phone || null,
+      urgency: insertRequest.urgency || "normal",
       status: "pending",
       createdAt: new Date(),
     };
@@ -118,6 +121,7 @@ export class MemStorage implements IStorage {
     const assistance: RegistrationAssistance = {
       ...insertAssistance,
       id,
+      documents: insertAssistance.documents || null,
       status: "pending",
       createdAt: new Date(),
     };
